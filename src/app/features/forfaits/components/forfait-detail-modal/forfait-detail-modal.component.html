@@ -1,0 +1,90 @@
+@if (isOpen() && item(); as item) {
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100 animate-scale-up space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-pantone-navy/10 text-pantone-navy flex items-center justify-center font-bold text-lg">
+            <i class="ti ti-box"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">
+              Offre SaaS — {{ item.nom }}
+            </h2>
+            <p class="text-xs text-slate-500 font-medium">
+              Détails des tarifs et quotas d'utilisation
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition-colors cursor-pointer"
+          (click)="close.emit()"
+        >
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-xs">
+        <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+          <span class="text-slate-400 font-medium">Prix Mensuel</span>
+          <div class="font-bold text-pantone-navy text-sm">
+            {{ item.prixMensuel | number }} FCFA <span class="text-[10px] font-normal text-slate-500">/mois</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+          <span class="text-slate-400 font-medium">Prix Annuel</span>
+          <div class="font-bold text-emerald-700 text-sm">
+            {{ item.prixAnnuel | number }} FCFA <span class="text-[10px] font-normal text-slate-500">/an</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+          <span class="text-slate-400 font-medium">Ateliers Max</span>
+          <div class="font-semibold text-slate-800 text-sm">{{ item.nbAteliersMax }} atelier(s)</div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+          <span class="text-slate-400 font-medium">Utilisateurs Max</span>
+          <div class="font-semibold text-slate-800 text-sm">{{ item.nbUtilisateursMax }} utilisateur(s)</div>
+        </div>
+
+
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+          <span class="text-slate-400 font-medium">Statut</span>
+          <div>
+            @if (item.estActif) {
+              <app-badge variant="success" size="sm">Disponible (Actif)</app-badge>
+            } @else {
+              <app-badge variant="neutral" size="sm">Masqué (Inactif)</app-badge>
+            }
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+          <span class="text-slate-400 font-medium">Créé le</span>
+          <div class="font-semibold text-slate-800">
+            {{ item.createdAt ? (item.createdAt | date: 'dd/MM/yyyy HH:mm') : 'N/A' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4 border-t border-slate-100">
+        <app-button
+          type="button"
+          variant="ghost"
+          (btnClick)="close.emit()"
+        >
+          Fermer
+        </app-button>
+      </div>
+    </div>
+  </div>
+}

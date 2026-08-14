@@ -1,0 +1,61 @@
+<div
+  class="fixed z-[10000] flex flex-col gap-3 p-4 max-w-sm w-full pointer-events-none"
+  [class.top-4]="position().startsWith('top')"
+  [class.right-4]="position().endsWith('right')"
+  [class.left-4]="position().endsWith('left')"
+  [class.bottom-4]="position().startsWith('bottom')"
+  [class.left-1\/2]="position() === 'top-center'"
+  [class.-translate-x-1\/2]="position() === 'top-center'"
+>
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="pointer-events-auto relative flex items-start gap-3 rounded-2xl p-4 shadow-xl border bg-white/95 backdrop-blur-md transition-all duration-300 animate-slideIn"
+      [class.border-emerald-200]="toast.type === 'success'"
+      [class.border-rose-200]="toast.type === 'error'"
+      [class.border-amber-200]="toast.type === 'warning'"
+      [class.border-sky-200]="toast.type === 'info'"
+    >
+      <!-- Type Icon -->
+      <div
+        class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl"
+        [class.bg-emerald-100]="toast.type === 'success'"
+        [class.text-emerald-600]="toast.type === 'success'"
+        [class.bg-rose-100]="toast.type === 'error'"
+        [class.text-rose-600]="toast.type === 'error'"
+        [class.bg-amber-100]="toast.type === 'warning'"
+        [class.text-amber-600]="toast.type === 'warning'"
+        [class.bg-sky-100]="toast.type === 'info'"
+        [class.text-sky-600]="toast.type === 'info'"
+      >
+        @switch (toast.type) {
+          @case ('success') { <i class="ti ti-circle-check text-xl"></i> }
+          @case ('error') { <i class="ti ti-alert-triangle text-xl"></i> }
+          @case ('warning') { <i class="ti ti-alert-circle text-xl"></i> }
+          @case ('info') { <i class="ti ti-info-circle text-xl"></i> }
+        }
+      </div>
+
+      <!-- Text -->
+      <div class="flex-1 pr-2">
+        @if (toast.title) {
+          <h4 class="text-sm font-semibold text-slate-900 mb-0.5">
+            {{ toast.title }}
+          </h4>
+        }
+        <p class="text-xs text-slate-600 leading-relaxed">
+          {{ toast.message }}
+        </p>
+      </div>
+
+      <!-- Dismiss Button -->
+      <button
+        type="button"
+        (click)="dismiss(toast.id)"
+        class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+        aria-label="Fermer la notification"
+      >
+        <i class="ti ti-x text-sm"></i>
+      </button>
+    </div>
+  }
+</div>

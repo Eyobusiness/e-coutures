@@ -1,0 +1,128 @@
+@if (isOpen()) {
+  <div
+    class="modal-backdrop fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100 animate-scale-up space-y-6 overflow-hidden my-8">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-lg">
+            <i class="ti ti-user-check"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              Fiche Couturier Cadastral
+            </h2>
+            <p class="text-xs text-slate-500">
+              Information de l'employé et atelier rattaché
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition-colors cursor-pointer"
+          (click)="close.emit()"
+        >
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="py-12 flex justify-center items-center">
+          <app-loader size="md" text="Chargement des détails du couturier..."></app-loader>
+        </div>
+      } @else if (detail(); as data) {
+        <div class="space-y-5 text-xs">
+          
+          <!-- Avatar & Header Profile -->
+          <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div class="w-16 h-16 rounded-full overflow-hidden bg-slate-200 border-2 border-white shadow flex-shrink-0 flex items-center justify-center text-slate-400 font-bold text-xl">
+              @if (data.photoUrl) {
+                <img [src]="data.photoUrl" [alt]="data.nomComplet" class="w-full h-full object-cover" />
+              } @else {
+                <i class="ti ti-user text-2xl text-slate-500"></i>
+              }
+            </div>
+
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold text-slate-900">{{ data.nomComplet }}</h3>
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px]">
+                  {{ data.libellePoste || data.posteMetier || 'Couturier' }}
+                </span>
+                @if (data.estActif) {
+                  <app-badge variant="success" size="sm">Actif</app-badge>
+                } @else {
+                  <app-badge variant="neutral" size="sm">Inactif</app-badge>
+                }
+              </div>
+              <p class="text-[11px] text-slate-500">Contrat : {{ data.typeContrat || 'Non renseigné' }}</p>
+            </div>
+          </div>
+
+          <!-- Contact & Atelier Grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+              <span class="text-slate-400 font-semibold text-[10px] uppercase">Téléphone</span>
+              <div class="font-semibold text-slate-800 flex items-center gap-1.5">
+                <i class="ti ti-phone text-emerald-600"></i> {{ data.telephone || 'N/A' }}
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl space-y-1">
+              <span class="text-slate-400 font-semibold text-[10px] uppercase">Email</span>
+              <div class="font-semibold text-slate-800 truncate flex items-center gap-1.5" [title]="data.email">
+                <i class="ti ti-mail text-emerald-600"></i> {{ data.email || 'N/A' }}
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl space-y-1 col-span-2">
+              <span class="text-slate-400 font-semibold text-[10px] uppercase">Atelier Rattaché</span>
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <i class="ti ti-building-store text-sky-600"></i> {{ data.atelierNom || 'Atelier Inconnu' }}
+              </div>
+              <div class="text-slate-500 text-[11px]">
+                {{ data.atelierVille }} - {{ data.atelierAdresse || 'Adresse non spécifiée' }}
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl space-y-1 col-span-2">
+              <span class="text-slate-400 font-semibold text-[10px] uppercase">Coordonnées GPS Cadastrales</span>
+              <div class="font-mono text-slate-800 font-semibold flex items-center gap-2">
+                <i class="ti ti-map-pin text-rose-500"></i>
+                Lat: {{ data.latitude || 0 }}, Long: {{ data.longitude || 0 }}
+              </div>
+            </div>
+
+            @if (data.qrPayload) {
+              <div class="p-3 bg-sky-50 rounded-xl border border-sky-100 space-y-1 col-span-2">
+                <span class="text-sky-800 font-semibold text-[10px] uppercase">Payload QR Code</span>
+                <div class="font-mono text-[11px] text-sky-900 bg-white p-2 rounded border border-sky-200 break-all">
+                  {{ data.qrPayload }}
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
+      <div class="flex justify-end pt-4 border-t border-slate-100">
+        <app-button
+          type="button"
+          variant="ghost"
+          (btnClick)="close.emit()"
+        >
+          Fermer
+        </app-button>
+      </div>
+
+    </div>
+  </div>
+}

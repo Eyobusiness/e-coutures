@@ -1,0 +1,89 @@
+<aside class="sidebar-container"
+       [class.collapsed]="layoutService.isSidebarCollapsed()"
+       [class.mobile-open]="layoutService.isMobileSidebarOpen()">
+
+  <!-- Logo Section -->
+  <div class="sidebar-header">
+    <div class="logo-wrapper">
+      <div class="logo-icon-container">
+        <i class="ti ti-scissors text-xl text-white"></i>
+      </div>
+      <span class="logo-text hide-collapsed">DIGITCOUTURE</span>
+    </div>
+    <!-- Mobile Close Button -->
+    <button class="mobile-close-btn" (click)="layoutService.closeMobileSidebar()" aria-label="Fermer le menu">
+      <i class="ti ti-x"></i>
+    </button>
+  </div>
+
+  <!-- Menu Navigation -->
+  <div class="sidebar-content">
+    <nav class="navigation" aria-label="Navigation principale">
+      <div class="nav-group">
+        <ul class="nav-list" role="list">
+          @for (menu of menus(); track (menu.id || menu.reference || menu.code || $index); let i = $index) {
+
+            <!-- Menu simple (sans sous-menus) -->
+            @if (!hasSubMenus(menu)) {
+              <li class="nav-list-item">
+                <a [routerLink]="getPath(menu)"
+                   routerLinkActive="active"
+                   [routerLinkActiveOptions]="{ exact: getPath(menu) === '/' || getPath(menu) === '/dashboard' }"
+                   (click)="handleItemClick()"
+                   class="nav-link"
+                   [attr.aria-label]="getLabel(menu)">
+                  @if (menu.icon) {
+                    <i class="nav-icon" [class]="getIcon(menu)" aria-hidden="true"></i>
+                  }
+                  <span class="nav-text hide-collapsed">{{ getLabel(menu) }}</span>
+                </a>
+              </li>
+            }
+
+            <!-- Menu avec sous-menus (collapse) -->
+            @if (hasSubMenus(menu)) {
+              <li class="nav-list-item dropdown" [class.open]="isMenuExpanded(getMenuKey(menu, i))">
+                <button
+                  type="button"
+                  (click)="toggleSubmenu(getMenuKey(menu, i), $event)"
+                  class="nav-link dropdown-toggle"
+                  [attr.aria-expanded]="isMenuExpanded(getMenuKey(menu, i))"
+                  [attr.aria-controls]="'submenu-' + getMenuKey(menu, i)"
+                  [attr.aria-label]="getLabel(menu)">
+                  @if (menu.icon) {
+                    <i class="nav-icon" [class]="getIcon(menu)" aria-hidden="true"></i>
+                  }
+                  <span class="nav-text hide-collapsed">{{ getLabel(menu) }}</span>
+                  <i class="chevron ti ti-chevron-down ms-auto hide-collapsed" aria-hidden="true"></i>
+                </button>
+
+                <!-- Sous-menus -->
+                <ul class="submenu"
+                    [id]="'submenu-' + getMenuKey(menu, i)"
+                    role="list">
+                  @for (sub of getSubMenus(menu); track (sub.id || sub.reference || sub.code || $index); let j = $index) {
+                    <li class="submenu-item">
+                      <a [routerLink]="getPath(sub)"
+                         routerLinkActive="active"
+                         (click)="handleItemClick()"
+                         class="submenu-link"
+                         [attr.aria-label]="getLabel(sub)">
+                        @if (sub.icon) {
+                          <i class="submenu-icon" [class]="getIcon(sub)" aria-hidden="true"></i>
+                        } @else {
+                          <i class="bi bi-circle submenu-icon text-[8px]" aria-hidden="true"></i>
+                        }
+                        <span class="submenu-text">{{ getLabel(sub) }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </li>
+            }
+
+          }
+        </ul>
+      </div>
+    </nav>
+  </div>
+</aside>

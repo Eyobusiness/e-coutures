@@ -1,0 +1,99 @@
+<app-page-header
+  title="Factures d'Abonnement"
+  subtitle="Facturation récurrente, échéances et paiements des abonnements"
+  icon="ti ti-file-invoice"
+  [breadcrumbs]="[
+    { label: 'Accueil', url: '/dashboard' },
+    { label: 'Factures', active: true }
+  ]"
+></app-page-header>
+
+<div class="space-y-6">
+  <app-card variant="default">
+    <!-- Top Toolbar -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b border-slate-100">
+      <div class="w-full sm:w-80">
+        <app-search
+          placeholder="Rechercher par référence, souscripteur, statut..."
+          (search)="onSearch($event)"
+        ></app-search>
+      </div>
+
+      <app-button
+        type="button"
+        variant="primary"
+        iconLeft="ti ti-plus"
+        (btnClick)="onOpenCreateForm()"
+      >
+        Nouvelle Facture
+      </app-button>
+    </div>
+
+    <!-- Table / Loader -->
+    <div class="p-4">
+      @if (isLoading()) {
+        <div class="py-12 flex justify-center items-center">
+          <app-loader size="lg" text="Chargement des factures..."></app-loader>
+        </div>
+      } @else {
+        <app-facture-table
+          [items]="filteredFactures()"
+          (view)="onViewDetails($event)"
+          (edit)="onOpenEditForm($event)"
+          (pay)="onOpenPayModal($event)"
+          (printReceipt)="onPrintReceipt($event)"
+          (delete)="onDelete($event)"
+        ></app-facture-table>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (!isLoading() && totalItems() > 0) {
+      <div class="p-4 border-t border-slate-100 flex items-center justify-between">
+        <div class="text-xs text-slate-500 font-medium">
+          Total : <span class="font-bold text-slate-900">{{ totalItems() }}</span> facture(s)
+        </div>
+
+        <app-pagination
+          [currentPage]="currentPage()"
+          [totalItems]="totalItems()"
+          [pageSize]="limit()"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+    }
+  </app-card>
+</div>
+
+<!-- Modals -->
+<app-facture-form
+  [isOpen]="isFormOpen()"
+  [facture]="selectedFacture()"
+  [abonnements]="abonnements()"
+  [souscripteurs]="souscripteurs()"
+  [forfaits]="forfaits()"
+  [loading]="isSaving()"
+  (save)="onSaveFacture($event)"
+  (cancel)="isFormOpen.set(false)"
+></app-facture-form>
+
+<app-facture-pay-modal
+  [isOpen]="isPayOpen()"
+  [facture]="selectedFacture()"
+  [loading]="isSaving()"
+  (submitPayment)="onConfirmPayment($event)"
+  (cancel)="isPayOpen.set(false)"
+></app-facture-pay-modal>
+
+<app-facture-detail-modal
+  [isOpen]="isDetailOpen()"
+  [item]="selectedFacture()"
+  (printReceipt)="onPrintReceipt($event)"
+  (close)="isDetailOpen.set(false)"
+></app-facture-detail-modal>
+
+<app-facture-recu-modal
+  [isOpen]="isRecuOpen()"
+  [item]="selectedFacture()"
+  (close)="isRecuOpen.set(false)"
+></app-facture-recu-modal>

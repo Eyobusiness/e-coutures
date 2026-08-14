@@ -1,0 +1,205 @@
+@if (isOpen() && item(); as item) {
+  <div
+    class="recu-backdrop fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-100 animate-scale-up overflow-hidden my-8 print-modal-container">
+      
+      <!-- Modal Header (Hidden during print) -->
+      <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50 print:hidden">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xl font-bold">
+            <i class="ti ti-receipt"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">
+              Reçu de Paiement #{{ getReceiptNumber(item.id) }}
+            </h2>
+            <p class="text-xs text-slate-500">
+              Aperçu et impression du reçu officiel de règlement
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <app-button
+            type="button"
+            variant="primary"
+            size="sm"
+            iconLeft="ti ti-printer"
+            (btnClick)="printReceipt()"
+          >
+            Imprimer le reçu
+          </app-button>
+
+          <button
+            type="button"
+            class="text-slate-400 hover:text-slate-600 p-2 rounded-lg transition-colors cursor-pointer"
+            (click)="close.emit()"
+            title="Fermer"
+          >
+            <i class="ti ti-x text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Area -->
+      <div id="printable-receipt-content" class="p-8 bg-white space-y-6 text-slate-800 font-sans">
+        
+        <!-- Header Brand & Document Title -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-2 border-slate-900 pb-6">
+          <div>
+            <div class="flex items-center gap-2 text-pantone-navy">
+              <i class="ti ti-scissors text-2xl text-emerald-600"></i>
+              <span class="text-2xl font-black tracking-tight text-slate-900">DIGIT<span class="text-emerald-600">COUTURE</span></span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1 font-medium">
+              Plateforme SaaS de Gestion d'Ateliers de Couture
+            </p>
+            <p class="text-xs text-slate-400">
+              Support & Facturation : support@digitcouture.com
+            </p>
+          </div>
+
+          <div class="text-left sm:text-right">
+            <div class="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-full border border-emerald-200 mb-1">
+              REÇU DE RÈGLEMENT
+            </div>
+            <div class="text-sm font-bold text-slate-900">
+              N° {{ getReceiptNumber(item.id) }}
+            </div>
+            <div class="text-xs text-slate-500">
+              Date : {{ (item.datePaiement || item.updatedAt || item.createdAt) | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Client & Transaction Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200/70 text-xs">
+          <div class="space-y-1.5">
+            <span class="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Client / Souscripteur</span>
+            <div class="text-sm font-bold text-slate-900">
+              {{ item.souscripteurNom || 'Souscripteur Client' }}
+            </div>
+            <div class="text-slate-600">
+              Offre d'Abonnement : <span class="font-medium text-slate-800">{{ item.abonnementNom || item.abonnementId }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <span class="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Informations Règlement</span>
+            <div class="flex justify-between text-slate-600">
+              <span>Mode de Paiement :</span>
+              <span class="font-semibold text-slate-800">{{ item.moyenPaiement || 'Carte / Mobile Money' }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Réf. Transaction :</span>
+              <span class="font-mono font-semibold text-slate-800">{{ item.refTransaction || 'TXN-' + (item.id ? item.id.substring(0, 8) : 'N/A') }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Statut de la Facture :</span>
+              <span>
+                @switch (item.statut.toLowerCase()) {
+                  @case ('payee') { <span class="font-bold text-emerald-600">PAYÉE</span> }
+                  @case ('en_attente') { <span class="font-bold text-amber-600">EN ATTENTE</span> }
+                  @default { <span class="font-bold text-slate-600">{{ item.statut }}</span> }
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="overflow-hidden rounded-xl border border-slate-200">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-100 text-slate-700 font-bold uppercase text-[10px] border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Désignation</th>
+                <th class="py-3 px-4">Échéance</th>
+                <th class="py-3 px-4 text-right">Montant Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-3.5 px-4">
+                  <div class="font-bold text-slate-900">
+                    Abonnement {{ item.abonnementNom || 'Plateforme DigitCouture' }}
+                  </div>
+                  <div class="text-[11px] text-slate-500">
+                    Règlement relatif à la souscription du service SaaS
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 text-slate-600 font-medium">
+                  {{ item.dateEcheance | date: 'dd/MM/yyyy' }}
+                </td>
+                <td class="py-3.5 px-4 text-right font-bold text-slate-900 text-sm">
+                  {{ item.montant }} {{ item.devise || 'XOF' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Total Paid & Stamp Box -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-2">
+          
+          <!-- Stamp / Signature Box -->
+          <div class="w-full sm:w-1/2 p-4 border border-dashed border-slate-300 rounded-xl text-center space-y-2">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cachet & Validation Service Client</span>
+            <div class="h-12 flex items-center justify-center">
+              <div class="px-3 py-1 border-2 border-emerald-600 text-emerald-600 rounded font-black text-xs uppercase tracking-widest rotate-[-3deg] shadow-sm">
+                RÉGLÉ - DIGITCOUTURE
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400">Document généré automatiquement le {{ (item.datePaiement || item.updatedAt || item.createdAt) | date: 'dd/MM/yyyy' }}</p>
+          </div>
+
+          <!-- Total Amount Paid Summary -->
+          <div class="w-full sm:w-1/2 bg-slate-900 text-white p-5 rounded-xl space-y-2 text-right shadow-md">
+            <span class="text-[11px] font-medium text-slate-300 uppercase tracking-wider">Montant Total Payé</span>
+            <div class="text-2xl font-black text-emerald-400">
+              {{ item.montant }} {{ item.devise || 'XOF' }}
+            </div>
+            <div class="text-[11px] text-emerald-300 font-semibold flex items-center justify-end gap-1">
+              <i class="ti ti-circle-check"></i> Paiement Intégral Confirmé
+            </div>
+          </div>
+        </div>
+
+        <!-- Receipt Footer Note -->
+        <div class="border-t border-slate-100 pt-4 text-center text-[11px] text-slate-400 space-y-1">
+          <p class="font-medium text-slate-600">Merci pour votre confiance !</p>
+          <p>Ce reçu sert de preuve officielle de paiement pour votre abonnement DigitCouture.</p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer (Hidden during print) -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between print:hidden">
+        <span class="text-xs text-slate-500 font-medium">Format d'impression optimisé (A4 / Reçu)</span>
+        <div class="flex items-center gap-2">
+          <app-button
+            type="button"
+            variant="ghost"
+            size="sm"
+            (btnClick)="close.emit()"
+          >
+            Fermer
+          </app-button>
+          <app-button
+            type="button"
+            variant="primary"
+            size="sm"
+            iconLeft="ti ti-printer"
+            (btnClick)="printReceipt()"
+          >
+            Imprimer
+          </app-button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

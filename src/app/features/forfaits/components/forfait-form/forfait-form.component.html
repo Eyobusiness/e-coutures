@@ -1,0 +1,104 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full border border-slate-100 animate-scale-up flex flex-col" style="max-height: 80vh;">
+      <!-- En-tête fixe -->
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4 shrink-0">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">
+            {{ forfait() ? "Modifier l'Offre" : "Nouvelle Offre SaaS" }}
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            {{ forfait() ? "Modifiez les prix et quotas du forfait." : "Renseignez les tarifs, quotas et options." }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+          (click)="cancel.emit()"
+        >
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Corps scrollable sans barre -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col flex-1 min-h-0">
+        <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3 no-scrollbar">
+          <app-input
+            formControlName="nom"
+            label="Nom du Forfait"
+            placeholder="Ex: Formule Pro, Pack Enterprise..."
+            iconLeft="ti ti-box"
+            [required]="true"
+          ></app-input>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <app-input
+              formControlName="prixMensuel"
+              type="number"
+              label="Prix Mensuel (FCFA)"
+              placeholder="Ex: 15000"
+              iconLeft="ti ti-cash"
+              [required]="true"
+            ></app-input>
+
+            <app-input
+              formControlName="prixAnnuel"
+              type="number"
+              label="Prix Annuel (FCFA)"
+              placeholder="Ex: 150000"
+              iconLeft="ti ti-calendar"
+              [required]="true"
+            ></app-input>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <app-input
+              formControlName="nbAteliersMax"
+              type="number"
+              label="Nb. Max Ateliers"
+              placeholder="Ex: 5"
+              iconLeft="ti ti-building"
+              [required]="true"
+            ></app-input>
+
+            <app-input
+              formControlName="nbUtilisateursMax"
+              type="number"
+              label="Nb. Max Utilisateurs"
+              placeholder="Ex: 10"
+              iconLeft="ti ti-users"
+              [required]="true"
+            ></app-input>
+          </div>
+
+
+
+          <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/60">
+            <input
+              id="estActif"
+              type="checkbox"
+              formControlName="estActif"
+              class="w-4 h-4 text-pantone-navy rounded border-slate-300 focus:ring-pantone-navy cursor-pointer"
+            />
+            <label for="estActif" class="text-xs font-medium text-slate-700 cursor-pointer select-none">
+              Rendre ce forfait disponible aux souscripteurs
+            </label>
+          </div>
+        </div>
+
+        <!-- Pied de page fixe -->
+        <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-100 shrink-0">
+          <app-button type="button" variant="ghost" (btnClick)="cancel.emit()">Annuler</app-button>
+          <app-button type="submit" variant="primary" iconLeft="ti ti-check" [loading]="loading()">
+            {{ forfait() ? 'Mettre à jour' : 'Enregistrer' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

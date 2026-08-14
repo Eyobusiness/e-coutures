@@ -1,0 +1,173 @@
+<app-page-header
+  title="Mon Profil"
+  subtitle="Gérez vos informations personnelles et vos paramètres de sécurité"
+  icon="ti ti-user-cog"
+  [breadcrumbs]="[
+    { label: 'Accueil', url: '/dashboard' },
+    { label: 'Mon profil', active: true }
+  ]"
+></app-page-header>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left Side: User Summary Card -->
+  <div class="lg:col-span-1 space-y-6">
+    <app-card variant="default">
+      <div class="flex flex-col items-center text-center p-4 space-y-4">
+        <app-avatar
+          [alt]="(user?.firstName || 'F') + ' ' + (user?.lastName || '')"
+          size="xl"
+          variant="circle"
+          status="online"
+        ></app-avatar>
+
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 font-heading">
+            {{ user?.firstName }} {{ user?.lastName }}
+          </h2>
+          <p class="text-xs text-slate-500 font-medium">
+            {{ user?.email || 'admin@digitcouture.com' }}
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 pt-2">
+          <app-badge variant="primary" size="md" icon="ti ti-shield">
+            {{ user?.profile?.label || 'Administrateur' }}
+          </app-badge>
+
+          <app-badge variant="success" size="md" [dot]="true">
+            {{ user?.profile?.status || 'Actif' }}
+          </app-badge>
+        </div>
+
+        <div class="w-full border-t border-slate-100 pt-4 text-left space-y-3 text-xs text-slate-600">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Code Utilisateur :</span>
+            <span class="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">{{ user?.code || 'N/A' }}</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-slate-400">Téléphone :</span>
+            <span class="font-medium text-slate-900">{{ user?.phone || 'N/A' }}</span>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <!-- Right Side: Forms (Profile Info & Password Change) -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Block 1: Personal Info -->
+    <app-card title="Informations Personnelles" subtitle="Vos coordonnées enregistrées sur l'API Backoffice" icon="ti ti-id">
+      <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <app-input
+            formControlName="lastName"
+            label="Nom"
+            placeholder="Votre nom"
+            iconLeft="ti ti-user"
+            [required]="true"
+          ></app-input>
+
+          <app-input
+            formControlName="firstName"
+            label="Prénom"
+            placeholder="Votre prénom"
+            iconLeft="ti ti-user"
+            [required]="true"
+          ></app-input>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <app-input
+            formControlName="email"
+            type="email"
+            label="Adresse Email"
+            placeholder="exemple@couture.com"
+            iconLeft="ti ti-mail"
+            [required]="true"
+          ></app-input>
+
+          <app-input
+            formControlName="phone"
+            type="tel"
+            label="Numéro de Téléphone"
+            placeholder="+225 0700000000"
+            iconLeft="ti ti-phone"
+            [required]="true"
+          ></app-input>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <app-input
+            formControlName="code"
+            label="Code Identifiant (Lecture seule)"
+            iconLeft="ti ti-barcode"
+          ></app-input>
+
+          <app-input
+            formControlName="role"
+            label="Rôle / Profil (Lecture seule)"
+            iconLeft="ti ti-shield"
+          ></app-input>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <app-button
+            type="submit"
+            variant="primary"
+            iconLeft="ti ti-device-floppy"
+            [loading]="isSavingProfile()"
+          >
+            Enregistrer les modifications
+          </app-button>
+        </div>
+      </form>
+    </app-card>
+
+    <!-- Block 2: Change Password -->
+    <app-card title="Changer de Mot de Passe" subtitle="Modifiez votre mot de passe pour sécuriser votre compte Backoffice" icon="ti ti-key">
+      <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="space-y-4">
+        <app-input
+          formControlName="currentPassword"
+          type="password"
+          label="Mot de passe actuel"
+          placeholder="••••••••"
+          iconLeft="ti ti-lock"
+          [required]="true"
+        ></app-input>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <app-input
+            formControlName="newPassword"
+            type="password"
+            label="Nouveau mot de passe"
+            placeholder="••••••••"
+            iconLeft="ti ti-lock-plus"
+            hint="Au moins 6 caractères"
+            [required]="true"
+          ></app-input>
+
+          <app-input
+            formControlName="confirmPassword"
+            type="password"
+            label="Confirmer le nouveau mot de passe"
+            placeholder="••••••••"
+            iconLeft="ti ti-check"
+            [required]="true"
+          ></app-input>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <app-button
+            type="submit"
+            variant="primary"
+            iconLeft="ti ti-key"
+            [loading]="isChangingPassword()"
+          >
+            Mettre à jour le mot de passe
+          </app-button>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>

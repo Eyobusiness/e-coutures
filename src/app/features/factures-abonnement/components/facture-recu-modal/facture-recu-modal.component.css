@@ -1,0 +1,37 @@
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .recu-backdrop,
+  .recu-backdrop * {
+    visibility: visible !important;
+  }
+
+  .recu-backdrop {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    z-index: 99999 !important;
+  }
+
+  .print-modal-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}

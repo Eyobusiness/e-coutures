@@ -1,0 +1,133 @@
+<div class="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+  <table class="w-full text-left text-sm border-collapse">
+    <thead class="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+      <tr>
+        <th class="py-3.5 px-4">Souscripteur / Abonnement</th>
+        <th class="py-3.5 px-4">Montant</th>
+        <th class="py-3.5 px-4">Échéance</th>
+        <th class="py-3.5 px-4">Paiement</th>
+        <th class="py-3.5 px-4">Statut</th>
+        <th class="py-3.5 px-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      @for (item of items(); track item.id) {
+        <tr class="hover:bg-slate-50/60 transition-colors">
+          <td class="py-3.5 px-4">
+            <div class="font-semibold text-slate-900">
+              {{ item.souscripteurNom || item.abonnementNom || 'Abonnement Client' }}
+            </div>
+            <div class="text-xs text-slate-400">
+              Référence: {{ item.refTransaction || 'Facture #' + (item.id ? item.id.substring(0, 8) : 'N/A') }}
+            </div>
+          </td>
+
+          <td class="py-3.5 px-4 font-bold text-slate-900">
+            {{ item.montant }} {{ item.devise || 'XOF' }}
+          </td>
+
+          <td class="py-3.5 px-4 text-xs text-slate-600">
+            {{ item.dateEcheance | date: 'dd/MM/yyyy' }}
+          </td>
+
+          <td class="py-3.5 px-4 text-xs">
+            @if (item.datePaiement) {
+              <div class="font-medium text-emerald-700">
+                Payé le {{ item.datePaiement | date: 'dd/MM/yyyy' }}
+              </div>
+              <div class="text-[11px] text-slate-400">
+                Via {{ item.moyenPaiement || 'Carte / Mobile' }}
+              </div>
+            } @else {
+              <span class="text-slate-400 italic">Non réglé</span>
+            }
+          </td>
+
+          <td class="py-3.5 px-4">
+            @switch (item.statut.toLowerCase()) {
+              @case ('payee') {
+                <app-badge variant="success" size="sm" [dot]="true">Payée</app-badge>
+              }
+              @case ('en_attente') {
+                <app-badge variant="warning" size="sm" [dot]="true">En Attente</app-badge>
+              }
+              @case ('en_retard') {
+                <app-badge variant="danger" size="sm" [dot]="true">En Retard</app-badge>
+              }
+              @default {
+                <app-badge variant="neutral" size="sm" [dot]="true">Annulée</app-badge>
+              }
+            }
+          </td>
+
+          <td class="py-3.5 px-4 text-right">
+            <div class="flex items-center justify-end gap-1">
+              @if (item.statut.toLowerCase() !== 'payee') {
+                <app-button
+                  type="button"
+                  variant="accent"
+                  size="sm"
+                  iconLeft="ti ti-cash-banknote"
+                  (btnClick)="pay.emit(item)"
+                  title="Enregistrer paiement"
+                >
+                  Payer
+                </app-button>
+              }
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-eye"
+                (btnClick)="view.emit(item)"
+                title="Voir détails"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-receipt"
+                (btnClick)="printReceipt.emit(item)"
+                title="Imprimer le reçu"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-pencil"
+                (btnClick)="edit.emit(item)"
+                title="Modifier"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-trash"
+                (btnClick)="delete.emit(item)"
+                title="Supprimer"
+              ></app-button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="py-8 text-center">
+            <app-empty-state
+              title="Aucune facture d'abonnement enregistrée"
+              description="Cliquez sur le bouton ci-dessus pour générer une nouvelle facture."
+              icon="ti ti-file-text-off"
+            ></app-empty-state>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,80 @@
+<app-page-header
+  title="Gestion des Profils & Habilitations"
+  subtitle="Rôles système, droits d'accès aux menus et autorisations administrateurs"
+  icon="ti ti-user-shield"
+  [breadcrumbs]="[
+    { label: 'Accueil', url: '/dashboard' },
+    { label: 'Profils', active: true }
+  ]"
+></app-page-header>
+
+<div class="space-y-6">
+  <app-card variant="default">
+    <!-- Top Toolbar -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b border-slate-100">
+      <div class="w-full sm:w-80">
+        <app-search
+          placeholder="Rechercher par libellé ou code..."
+          (search)="onSearch($event)"
+        ></app-search>
+      </div>
+
+      <app-button
+        type="button"
+        variant="primary"
+        iconLeft="ti ti-plus"
+        (btnClick)="onOpenCreateForm()"
+      >
+        Nouveau Profil
+      </app-button>
+    </div>
+
+    <!-- Content Table / Loader -->
+    <div class="p-4">
+      @if (isLoading()) {
+        <div class="py-12 flex justify-center items-center">
+          <app-loader size="lg" text="Chargement des profils..."></app-loader>
+        </div>
+      } @else {
+        <app-profil-table
+          [items]="filteredProfiles()"
+          (view)="onViewDetails($event)"
+          (edit)="onOpenEditForm($event)"
+          (delete)="onDelete($event)"
+        ></app-profil-table>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (!isLoading() && totalItems() > 0) {
+      <div class="p-4 border-t border-slate-100 flex items-center justify-between">
+        <div class="text-xs text-slate-500 font-medium">
+          Total : <span class="font-bold text-slate-900">{{ totalItems() }}</span> profil(s)
+        </div>
+
+        <app-pagination
+          [currentPage]="currentPage()"
+          [totalItems]="totalItems()"
+          [pageSize]="limit()"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+    }
+  </app-card>
+</div>
+
+<!-- Modals -->
+<app-profil-form
+  [isOpen]="isFormOpen()"
+  [profil]="selectedProfile()"
+  [menus]="menus()"
+  [loading]="isSaving()"
+  (save)="onSaveProfile($event)"
+  (cancel)="isFormOpen.set(false)"
+></app-profil-form>
+
+<app-profil-detail-modal
+  [isOpen]="isDetailOpen()"
+  [item]="selectedProfile()"
+  (close)="isDetailOpen.set(false)"
+></app-profil-detail-modal>

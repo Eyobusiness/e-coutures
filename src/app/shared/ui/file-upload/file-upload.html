@@ -1,0 +1,80 @@
+<div class="space-y-2">
+  @if (label()) {
+    <label class="block text-sm font-medium text-slate-700">
+      {{ label() }}
+    </label>
+  }
+
+  <div
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+    class="relative flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed transition-all cursor-pointer select-none group"
+    [class.border-indigo-500]="isDragging()"
+    [class.bg-indigo-50/50]="isDragging()"
+    [class.border-slate-300]="!isDragging()"
+    [class.bg-slate-50/60]="!isDragging()"
+    [class.hover:border-indigo-400]="!disabled()"
+    [class.hover:bg-slate-100/60]="!disabled()"
+    [class.opacity-60]="disabled()"
+    [class.cursor-not-allowed]="disabled()"
+  >
+    <input
+      #fileInput
+      type="file"
+      class="hidden"
+      [accept]="accept()"
+      [multiple]="multiple()"
+      [disabled]="disabled()"
+      (change)="onFileChange($event)"
+    />
+
+    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 mb-3 group-hover:scale-110 transition-transform">
+      <i class="ti ti-cloud-upload text-2xl"></i>
+    </div>
+
+    <p class="text-sm font-semibold text-slate-900 mb-0.5">
+      Glissez vos fichiers ici ou <span class="text-indigo-600 underline">parcourir</span>
+    </p>
+
+    @if (hint()) {
+      <p class="text-xs text-slate-500">
+        {{ hint() }}
+      </p>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="text-xs text-rose-600 flex items-center gap-1 mt-1">
+      <i class="ti ti-alert-circle"></i>
+      <span>{{ errorMessage() }}</span>
+    </p>
+  }
+
+  @if (files().length > 0) {
+    <ul class="mt-3 space-y-2">
+      @for (f of files(); track $index) {
+        <li class="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200 shadow-sm text-sm">
+          <div class="flex items-center gap-3 truncate pr-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+              <i class="ti ti-file text-lg"></i>
+            </div>
+            <div class="truncate">
+              <p class="font-medium text-slate-900 truncate">{{ f.name }}</p>
+              <p class="text-xs text-slate-400">{{ formatSize(f.size) }}</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="removeFile($index, $event)"
+            class="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+          >
+            <i class="ti ti-trash text-base"></i>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

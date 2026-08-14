@@ -1,0 +1,135 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 border border-slate-100 animate-scale-up space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">
+            {{ abonnement() ? "Modifier l'Abonnement" : "Créer un Abonnement" }}
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            {{ abonnement() ? "Modifiez le souscripteur, la périodicité et le forfait associé." : "Sélectionnez le souscripteur, la périodicité puis le forfait pour créer l'abonnement." }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition-colors cursor-pointer"
+          (click)="cancel.emit()"
+        >
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Row 1: Souscripteur & Périodicité -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <app-select
+            formControlName="souscripteurId"
+            label="Souscripteur"
+            [options]="souscripteurOptions()"
+            [required]="true"
+          ></app-select>
+
+          <app-select
+            formControlName="periode"
+            label="Périodicité"
+            [options]="periodeOptions"
+            [required]="true"
+          ></app-select>
+        </div>
+
+        <!-- Row 2: Forfait / Formule (Placé APRES Périodicité) & Statut -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <app-select
+            formControlName="forfaitId"
+            [label]="selectedPeriode() === 'annuel' ? 'Formule' : 'Formule'"
+            [options]="forfaitOptions()"
+            [required]="true"
+          ></app-select>
+
+          <app-select
+            formControlName="statut"
+            label="Statut"
+            [options]="statutOptions"
+            [required]="true"
+          ></app-select>
+        </div>
+
+        <!-- Preview Card for Selected Forfait Price -->
+        @if (selectedForfaitDetail(); as forfait) {
+          <div class="p-3.5 rounded-xl border border-indigo-100 bg-indigo-50/60 flex items-center justify-between animate-fadeIn">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">
+                <i class="ti ti-box"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-slate-800 block">Formule : {{ forfait.nom }}</span>
+                <p class="text-[11px] text-slate-500">
+                  {{ selectedPeriode() === 'annuel' ? 'Affichage du tarif annuel (Prix maximum)' : 'Affichage du tarif mensuel (Prix minimum)' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="text-right">
+              <span class="text-[11px] font-medium text-slate-500 block">Tarif appliqué</span>
+              <div class="text-base font-extrabold text-indigo-700">
+                {{ selectedPeriode() === 'annuel' ? (forfait.prixAnnuel || (forfait.prixMensuel * 12)) : forfait.prixMensuel }} FCFA
+                <span class="text-xs font-semibold text-slate-500">{{ selectedPeriode() === 'annuel' ? '/ an' : '/ mois' }}</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Row 3: Dates & Renouvellement -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <app-input
+            formControlName="dateDebut"
+            type="date"
+            label="Date de début"
+            iconLeft="ti ti-calendar"
+            [required]="true"
+          ></app-input>
+
+          <app-input
+            formControlName="dateFin"
+            type="date"
+            label="Date de fin"
+            iconLeft="ti ti-calendar"
+            [required]="true"
+          ></app-input>
+
+          <app-select
+            formControlName="renouvellementAuto"
+            label="Renouvellement"
+            [options]="renouvellementOptions"
+            [required]="true"
+          ></app-select>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <app-button
+            type="button"
+            variant="ghost"
+            (btnClick)="cancel.emit()"
+          >
+            Annuler
+          </app-button>
+
+          <app-button
+            type="submit"
+            variant="primary"
+            iconLeft="ti ti-check"
+            [loading]="loading()"
+          >
+            {{ abonnement() ? 'Mettre à jour' : 'Enregistrer' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

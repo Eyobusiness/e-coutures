@@ -1,0 +1,123 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full border border-slate-100 animate-scale-up flex flex-col" style="max-height: 80vh;">
+      <!-- En-tête fixe -->
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4 shrink-0">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">
+            {{ facture() ? "Modifier la Facture" : "Créer une Facture d'Abonnement" }}
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">
+            {{ facture() ? "Modifiez les informations de la facture." : "Renseignez les détails de la nouvelle facture." }}
+          </p>
+        </div>
+        <button
+          type="button"
+          class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+          (click)="cancel.emit()"
+        >
+          <i class="ti ti-x text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Corps scrollable sans barre -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col flex-1 min-h-0">
+        <div class="flex-1 overflow-y-auto px-5 py-4 space-y-3 no-scrollbar">
+          <!-- Sélection du Souscripteur & Abonnement -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            @if (souscripteurOptions().length > 1) {
+              <app-select
+                formControlName="souscripteurId"
+                label="Souscripteur (Optionnel)"
+                [options]="souscripteurOptions()"
+                placeholder="Filtrer par souscripteur..."
+              ></app-select>
+            }
+
+            @if (abonnementOptions().length > 0) {
+              <app-select
+                formControlName="abonnementId"
+                label="Abonnement"
+                [options]="abonnementOptions()"
+                [required]="true"
+              ></app-select>
+            } @else {
+              <app-input
+                formControlName="abonnementId"
+                label="ID Abonnement"
+                placeholder="Identifiant de l'abonnement"
+                iconLeft="ti ti-receipt"
+                [required]="true"
+              ></app-input>
+            }
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <app-input
+              formControlName="montant"
+              type="number"
+              label="Montant"
+              placeholder="Ex: 15000"
+              iconLeft="ti ti-currency-dollar"
+              [required]="true"
+            ></app-input>
+
+            <app-select
+              formControlName="statut"
+              label="Statut"
+              [options]="statutOptions"
+              [required]="true"
+            ></app-select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <app-input
+              formControlName="dateEcheance"
+              type="date"
+              label="Date d'Échéance"
+              iconLeft="ti ti-calendar"
+              [required]="true"
+            ></app-input>
+
+            <app-input
+              formControlName="devise"
+              label="Devise"
+              placeholder="Ex: XOF"
+              iconLeft="ti ti-coin"
+              [required]="true"
+            ></app-input>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <app-select
+              formControlName="moyenPaiement"
+              label="Moyen de Paiement"
+              [options]="moyenPaiementOptions"
+              placeholder="Sélectionner le moyen de paiement..."
+            ></app-select>
+
+            <app-input
+              formControlName="refTransaction"
+              label="Référence Transaction"
+              placeholder="Ex: TXN-984201"
+              iconLeft="ti ti-hash"
+            ></app-input>
+          </div>
+        </div>
+
+        <!-- Pied de page fixe -->
+        <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-100 shrink-0">
+          <app-button type="button" variant="ghost" (btnClick)="cancel.emit()">Annuler</app-button>
+          <app-button type="submit" variant="primary" iconLeft="ti ti-check" [loading]="loading()">
+            {{ facture() ? 'Mettre à jour' : 'Enregistrer' }}
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,35 @@
+<nav class="flex" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-2 text-sm font-medium text-slate-500">
+    @for (item of items(); track $index; let last = $last) {
+      <li class="inline-flex items-center">
+        @if ($index > 0) {
+          <i [class]="separatorIcon() + ' text-slate-400 mx-1 md:mx-2 text-xs flex-shrink-0'"></i>
+        }
+
+        @if (item.url && !last && !item.active) {
+          <a
+            [routerLink]="item.url"
+            class="inline-flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-medium transition-colors"
+          >
+            @if (item.icon) {
+              <i [class]="item.icon + ' text-base'"></i>
+            }
+            <span>{{ item.label }}</span>
+          </a>
+        } @else {
+          <span
+            class="inline-flex items-center gap-1.5 font-semibold"
+            [class.text-slate-900]="last || item.active"
+            [class.text-slate-500]="!last && !item.active"
+            [attr.aria-current]="last || item.active ? 'page' : null"
+          >
+            @if (item.icon) {
+              <i [class]="item.icon + ' text-base'"></i>
+            }
+            <span>{{ item.label }}</span>
+          </span>
+        }
+      </li>
+    }
+  </ol>
+</nav>

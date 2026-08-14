@@ -1,0 +1,101 @@
+<header class="header">
+
+  <!-- Left header controls -->
+  <div class="header-left">
+    <button class="menu-btn" (click)="toggleSidebar($event)" aria-label="Menu principal">
+      <i class="ti ti-menu-2"></i>
+    </button>
+    <div class="header-title">
+      <span class="title-sub">Console Super Admin</span>
+      <h2 class="title-main">Digitcouture SaaS</h2>
+    </div>
+  </div>
+
+  <!-- Right header actions -->
+  <div class="header-right">
+    
+    <!-- Notifications -->
+    <button class="action-btn" aria-label="Notifications">
+      <i class="ti ti-bell"></i>
+      <span class="badge"></span>
+    </button>
+
+    <!-- Theme Toggle -->
+    <button class="action-btn" aria-label="Mode sombre">
+      <i class="ti ti-moon"></i>
+    </button>
+
+    <!-- Profile Dropdown Section -->
+    <div class="relative">
+      <button
+        type="button"
+        (click)="toggleDropdown($event)"
+        class="profile-container focus:outline-none cursor-pointer"
+        aria-haspopup="true"
+        [attr.aria-expanded]="isDropdownOpen()"
+      >
+        <div class="profile-info text-right">
+          <h5 class="profile-name">
+            {{ authService.currentUser()?.firstName || 'Utilisateur' }} {{ authService.currentUser()?.lastName || '' }}
+          </h5>
+          <span class="profile-role">
+            {{ authService.currentUser()?.profile?.label || 'Administrateur' }}
+          </span>
+        </div>
+        
+        <app-avatar
+          [alt]="(authService.currentUser()?.firstName || 'F') + ' ' + (authService.currentUser()?.lastName || '')"
+          size="md"
+          variant="circle"
+          status="online"
+        ></app-avatar>
+
+        <i class="ti ti-chevron-down text-slate-400 text-xs transition-transform duration-200" [class.rotate-180]="isDropdownOpen()"></i>
+      </button>
+
+      <!-- Dropdown Menu -->
+      @if (isDropdownOpen()) {
+        <div
+          class="absolute right-0 z-50 mt-2 w-56 transform rounded-2xl border border-slate-200/90 bg-white/95 p-1.5 shadow-2xl backdrop-blur-md animate-scaleUp"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <!-- User info header -->
+          <div class="px-3 py-2.5 border-b border-slate-100 mb-1">
+            <p class="text-xs font-semibold text-slate-900 truncate">
+              {{ authService.currentUser()?.firstName }} {{ authService.currentUser()?.lastName }}
+            </p>
+            <p class="text-[11px] text-slate-500 truncate">
+              {{ authService.currentUser()?.email || 'admin@digitcouture.com' }}
+            </p>
+          </div>
+
+          <!-- Items -->
+          <a
+            routerLink="/mon-profil"
+            (click)="closeDropdown()"
+            class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+            role="menuitem"
+          >
+            <i class="ti ti-user text-base text-slate-400"></i>
+            <span>Mon profil</span>
+          </a>
+
+          <div class="my-1 border-t border-slate-100"></div>
+
+          <button
+            type="button"
+            (click)="onLogout()"
+            class="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            role="menuitem"
+          >
+            <i class="ti ti-logout text-base text-rose-500"></i>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</header>

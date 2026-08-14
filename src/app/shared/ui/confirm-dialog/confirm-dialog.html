@@ -1,0 +1,88 @@
+@if (activeState().open) {
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fadeIn">
+    <!-- Backdrop -->
+    <div
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+      (click)="onCancel()"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Modal Box -->
+    <div
+      class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-2xl transition-all border border-slate-100 z-10 animate-scaleUp"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="'confirm-dialog-title'"
+    >
+      <div class="flex items-start gap-4">
+        <!-- Icon Container -->
+        <div
+          class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl"
+          [class.bg-rose-100]="activeState().variant === 'danger'"
+          [class.text-rose-600]="activeState().variant === 'danger'"
+          [class.bg-amber-100]="activeState().variant === 'warning'"
+          [class.text-amber-600]="activeState().variant === 'warning'"
+          [class.bg-sky-100]="activeState().variant === 'info'"
+          [class.text-sky-600]="activeState().variant === 'info'"
+          [class.bg-emerald-100]="activeState().variant === 'success'"
+          [class.text-emerald-600]="activeState().variant === 'success'"
+          [class.bg-pantone-navy/10]="activeState().variant === 'primary'"
+          [class.text-pantone-navy]="activeState().variant === 'primary'"
+        >
+          @if (activeState().icon) {
+            <i [class]="activeState().icon + ' text-2xl'"></i>
+          } @else {
+            @switch (activeState().variant) {
+              @case ('danger') { <i class="ti ti-alert-triangle text-2xl"></i> }
+              @case ('warning') { <i class="ti ti-alert-circle text-2xl"></i> }
+              @case ('info') { <i class="ti ti-info-circle text-2xl"></i> }
+              @case ('success') { <i class="ti ti-circle-check text-2xl"></i> }
+              @default { <i class="ti ti-help-circle text-2xl"></i> }
+            }
+          }
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1">
+          <h3 id="confirm-dialog-title" class="text-lg font-semibold text-slate-900">
+            {{ activeState().title }}
+          </h3>
+          <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+            {{ activeState().message }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+        <button
+          type="button"
+          (click)="onCancel()"
+          [disabled]="loading()"
+          class="btn btn-ghost cursor-pointer"
+        >
+          {{ activeState().cancelText }}
+        </button>
+
+        <button
+          type="button"
+          (click)="onConfirm()"
+          [disabled]="loading()"
+          class="btn cursor-pointer"
+          [class.btn-danger]="activeState().variant === 'danger'"
+          [class.btn-accent]="activeState().variant === 'warning'"
+          [class.btn-secondary]="activeState().variant === 'info'"
+          [class.btn-primary]="activeState().variant === 'primary' || activeState().variant === 'success'"
+        >
+          @if (loading()) {
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          }
+          {{ activeState().confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

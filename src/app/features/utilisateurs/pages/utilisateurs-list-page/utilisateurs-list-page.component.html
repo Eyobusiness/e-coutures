@@ -1,0 +1,82 @@
+<app-page-header
+  title="Gestion des Administrateurs"
+  subtitle="Comptes utilisateurs administrateurs SaaS (création, rôles, statuts et réinitialisations)"
+  icon="ti ti-users"
+  [breadcrumbs]="[
+    { label: 'Accueil', url: '/dashboard' },
+    { label: 'Utilisateurs', active: true }
+  ]"
+></app-page-header>
+
+<div class="space-y-6">
+  <app-card variant="default">
+    <!-- Top Toolbar -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-b border-slate-100">
+      <div class="w-full sm:w-80">
+        <app-search
+          placeholder="Rechercher par nom, email, code..."
+          (search)="onSearch($event)"
+        ></app-search>
+      </div>
+
+      <app-button
+        type="button"
+        variant="primary"
+        iconLeft="ti ti-plus"
+        (btnClick)="onOpenCreateForm()"
+      >
+        Nouvel Administrateur
+      </app-button>
+    </div>
+
+    <!-- Content Table / Loader -->
+    <div class="p-4">
+      @if (isLoading()) {
+        <div class="py-12 flex justify-center items-center">
+          <app-loader size="lg" text="Chargement des administrateurs..."></app-loader>
+        </div>
+      } @else {
+        <app-utilisateur-table
+          [items]="filteredAdmins()"
+          [profiles]="profiles()"
+          (view)="onViewDetails($event)"
+          (edit)="onOpenEditForm($event)"
+          (delete)="onDelete($event)"
+        ></app-utilisateur-table>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (!isLoading() && totalItems() > 0) {
+      <div class="p-4 border-t border-slate-100 flex items-center justify-between">
+        <div class="text-xs text-slate-500 font-medium">
+          Total : <span class="font-bold text-slate-900">{{ totalItems() }}</span> administrateur(s)
+        </div>
+
+        <app-pagination
+          [currentPage]="currentPage()"
+          [totalItems]="totalItems()"
+          [pageSize]="limit()"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+    }
+  </app-card>
+</div>
+
+<!-- Modals -->
+<app-utilisateur-form
+  [isOpen]="isFormOpen()"
+  [admin]="selectedAdmin()"
+  [profiles]="profiles()"
+  [loading]="isSaving()"
+  (save)="onSaveAdmin($event)"
+  (cancel)="isFormOpen.set(false)"
+></app-utilisateur-form>
+
+<app-utilisateur-detail-modal
+  [isOpen]="isDetailOpen()"
+  [item]="selectedAdmin()"
+  [profiles]="profiles()"
+  (close)="isDetailOpen.set(false)"
+></app-utilisateur-detail-modal>

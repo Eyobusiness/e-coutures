@@ -1,0 +1,152 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <app-page-header
+    title="Gestion des Paiements & Règlements"
+    subtitle="Enregistrez et suivez les encaissements de factures d'abonnement."
+  >
+    <div class="flex items-center gap-3" actionSlot>
+      <app-button
+        variant="primary"
+        size="md"
+        iconLeft="ti ti-credit-card"
+        (clicked)="onOpenPayModal()"
+      >
+        Enregistrer un Règlement
+      </app-button>
+    </div>
+  </app-page-header>
+
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <app-card class="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/20">
+      <div class="flex items-center justify-between p-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Montant Encaissé</p>
+          <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ formatAmount(montantTotalPaye()) }} FCFA</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+          <i class="ti ti-cash text-2xl"></i>
+        </div>
+      </div>
+    </app-card>
+
+    <app-card class="bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent border-indigo-500/20">
+      <div class="flex items-center justify-between p-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Factures Réglées</p>
+          <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ countPayees() }}</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+          <i class="ti ti-circle-check text-2xl"></i>
+        </div>
+      </div>
+    </app-card>
+
+    <app-card class="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border-amber-500/20">
+      <div class="flex items-center justify-between p-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">En Attente de Règlement</p>
+          <p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">{{ countEnAttente() }}</p>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
+          <i class="ti ti-clock text-2xl"></i>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <app-card>
+    <div class="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="w-full md:w-80">
+        <app-search
+          placeholder="Rechercher une référence, client..."
+          [value]="searchQuery()"
+          (search)="onSearch($event)"
+        ></app-search>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+          [class.bg-indigo-600]="activeFilter() === 'ALL'"
+          [class.text-white]="activeFilter() === 'ALL'"
+          [class.bg-slate-100]="activeFilter() !== 'ALL'"
+          [class.text-slate-600]="activeFilter() !== 'ALL'"
+          (click)="activeFilter.set('ALL')"
+        >
+          Tous ({{ factures().length }})
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+          [class.bg-emerald-600]="activeFilter() === 'PAYEE'"
+          [class.text-white]="activeFilter() === 'PAYEE'"
+          [class.bg-slate-100]="activeFilter() !== 'PAYEE'"
+          [class.text-slate-600]="activeFilter() !== 'PAYEE'"
+          (click)="activeFilter.set('PAYEE')"
+        >
+          Réglés ({{ countPayees() }})
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+          [class.bg-amber-600]="activeFilter() === 'EN_ATTENTE'"
+          [class.text-white]="activeFilter() === 'EN_ATTENTE'"
+          [class.bg-slate-100]="activeFilter() !== 'EN_ATTENTE'"
+          [class.text-slate-600]="activeFilter() !== 'EN_ATTENTE'"
+          (click)="activeFilter.set('EN_ATTENTE')"
+        >
+          En Attente ({{ countEnAttente() }})
+        </button>
+      </div>
+    </div>
+  </app-card>
+
+  <!-- Main Data Table -->
+  <app-card>
+    @if (isLoading()) {
+      <div class="p-12 flex justify-center">
+        <app-loader size="lg" label="Chargement des règlements..."></app-loader>
+      </div>
+    } @else {
+      <app-facture-table
+        [items]="filteredFactures()"
+        (pay)="onOpenPayModalFor($event)"
+        (view)="onViewDetails($event)"
+        (printReceipt)="onPrintReceipt($event)"
+      ></app-facture-table>
+
+      <div class="p-4 border-t border-slate-100">
+        <app-pagination
+          [currentPage]="currentPage()"
+          [pageSize]="limit()"
+          [totalItems]="totalItems()"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+    }
+  </app-card>
+
+  <!-- Modales -->
+  <app-facture-pay-modal
+    [isOpen]="isPayOpen()"
+    [facture]="selectedFacture()"
+    [loading]="isSaving()"
+    (cancel)="isPayOpen.set(false)"
+    (submitPayment)="onConfirmPayment($event)"
+  ></app-facture-pay-modal>
+
+  <app-facture-detail-modal
+    [isOpen]="isDetailOpen()"
+    [item]="selectedFacture()"
+    (close)="isDetailOpen.set(false)"
+  ></app-facture-detail-modal>
+
+  <app-facture-recu-modal
+    [isOpen]="isRecuOpen()"
+    [item]="selectedFacture()"
+    (close)="isRecuOpen.set(false)"
+  ></app-facture-recu-modal>
+</div>

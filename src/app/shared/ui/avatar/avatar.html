@@ -1,0 +1,61 @@
+<div
+  class="relative flex items-center justify-center font-medium select-none overflow-hidden transition-transform duration-200 hover:scale-105"
+  [class.w-6]="size() === 'xs'"
+  [class.h-6]="size() === 'xs'"
+  [class.text-xs]="size() === 'xs'"
+  [class.w-8]="size() === 'sm'"
+  [class.h-8]="size() === 'sm'"
+  [class.text-xs]="size() === 'sm'"
+  [class.w-10]="size() === 'md'"
+  [class.h-10]="size() === 'md'"
+  [class.text-sm]="size() === 'md'"
+  [class.w-12]="size() === 'lg'"
+  [class.h-12]="size() === 'lg'"
+  [class.text-base]="size() === 'lg'"
+  [class.w-16]="size() === 'xl'"
+  [class.h-16]="size() === 'xl'"
+  [class.text-xl]="size() === 'xl'"
+  [class.rounded-full]="variant() === 'circle'"
+  [class.rounded-xl]="variant() === 'rounded'"
+  [class.rounded-md]="variant() === 'square'"
+  [class.bg-gradient-to-br]="!hasImage()"
+  [class.from-slate-700]="!hasImage()"
+  [class.to-slate-900]="!hasImage()"
+  [class.text-white]="!hasImage()"
+  [class.shadow-sm]="true"
+  [class.ring-2]="true"
+  [class.ring-white/10]="true"
+>
+  @if (hasImage()) {
+    <img
+      [src]="src()"
+      [alt]="alt()"
+      (error)="onImageError()"
+      class="w-full h-full object-cover"
+    />
+  } @else {
+    <span>{{ computedInitials() }}</span>
+  }
+</div>
+
+@if (status()) {
+  <span
+    class="absolute right-0 bottom-0 block ring-2 ring-slate-900 rounded-full"
+    [class.w-2]="size() === 'xs' || size() === 'sm'"
+    [class.h-2]="size() === 'xs' || size() === 'sm'"
+    [class.w-2.5]="size() === 'md'"
+    [class.h-2.5]="size() === 'md'"
+    [class.w-3.5]="size() === 'lg' || size() === 'xl'"
+    [class.h-3.5]="size() === 'lg' || size() === 'xl'"
+    [class.bg-emerald-500]="status() === 'online'"
+    [class.bg-slate-400]="status() === 'offline'"
+    [class.bg-rose-500]="status() === 'busy'"
+    [class.bg-amber-500]="status() === 'away'"
+  ></span>
+}
+
+@if (badgeText()) {
+  <span class="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-bold text-white ring-2 ring-slate-900">
+    {{ badgeText() }}
+  </span>
+}

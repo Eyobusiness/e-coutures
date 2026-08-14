@@ -1,0 +1,117 @@
+<div class="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+  <table class="w-full text-left text-sm border-collapse">
+    <thead class="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+      <tr>
+        <th class="py-3.5 px-4">Souscripteur</th>
+        <th class="py-3.5 px-4">Forfait / Formule</th>
+        <th class="py-3.5 px-4">Périodicité</th>
+        <th class="py-3.5 px-4">Dates Validité</th>
+        <th class="py-3.5 px-4">Statut</th>
+        <th class="py-3.5 px-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      @for (item of items(); track item.id) {
+        <tr class="hover:bg-slate-50/60 transition-colors">
+          <td class="py-3.5 px-4">
+            <div class="font-semibold text-slate-900">
+              {{ item.souscripteurNom || (item.souscripteurId ? 'Souscripteur #' + item.souscripteurId.substring(0, 8) : 'Non assigné') }}
+            </div>
+          </td>
+
+          <td class="py-3.5 px-4 font-medium text-indigo-600">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-100/80 text-indigo-700 text-xs font-semibold">
+              <i class="ti ti-box text-xs"></i>
+              {{ item.forfaitNom || item.forfaitId }}
+            </span>
+          </td>
+
+          <td class="py-3.5 px-4">
+            <div class="flex items-center gap-1.5">
+              <span class="inline-block text-xs uppercase font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                {{ item.periode || 'mensuel' }}
+              </span>
+              @if (item.renouvellementAuto) {
+                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded" title="Renouvellement automatique">
+                  <i class="ti ti-refresh text-[10px]"></i> Auto
+                </span>
+              }
+            </div>
+          </td>
+
+          <td class="py-3.5 px-4 text-xs space-y-0.5">
+            <div class="text-slate-700 font-medium">Début: {{ item.dateDebut || 'N/A' }}</div>
+            <div class="text-slate-500">Fin: {{ item.dateFin || 'N/A' }}</div>
+          </td>
+
+          <td class="py-3.5 px-4">
+            @switch ((item.statut || '').toLowerCase()) {
+              @case ('en_essai') {
+                <app-badge variant="warning" size="sm" [dot]="true">Essai</app-badge>
+              }
+              @case ('actif') {
+                <app-badge variant="success" size="sm" [dot]="true">Actif</app-badge>
+              }
+              @case ('inactif') {
+                <app-badge variant="danger" size="sm" [dot]="true">Inactif</app-badge>
+              }
+              @case ('expire') {
+                <app-badge variant="neutral" size="sm" [dot]="true">Expiré</app-badge>
+              }
+              @case ('suspendu') {
+                <app-badge variant="danger" size="sm" [dot]="true">Suspendu</app-badge>
+              }
+              @default {
+                <app-badge variant="neutral" size="sm" [dot]="true">{{ item.statut || 'Inconnu' }}</app-badge>
+              }
+            }
+          </td>
+
+          <td class="py-3.5 px-4 text-right">
+            <div class="flex items-center justify-end gap-1">
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-eye"
+                (btnClick)="view.emit(item)"
+                title="Voir détails"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-pencil"
+                (btnClick)="edit.emit(item)"
+                title="Modifier"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-trash"
+                (btnClick)="delete.emit(item)"
+                title="Supprimer"
+              ></app-button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="py-8 text-center">
+            <app-empty-state
+              title="Aucun abonnement enregistré"
+              description="Cliquez sur le bouton ci-dessus pour ajouter un nouvel abonnement."
+              icon="ti ti-receipt-off"
+            ></app-empty-state>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

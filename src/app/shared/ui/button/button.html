@@ -1,0 +1,79 @@
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  (click)="onClick($event)"
+  class="relative inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed select-none active:scale-[0.98]"
+  [class.w-full]="fullWidth()"
+  [class.rounded-lg]="true"
+  [class.text-xs]="size() === 'sm'"
+  [class.px-3]="size() === 'sm' && !iconOnly()"
+  [class.py-1.5]="size() === 'sm' && !iconOnly()"
+  [class.p-1.5]="size() === 'sm' && iconOnly()"
+  [class.text-sm]="size() === 'md'"
+  [class.px-4]="size() === 'md' && !iconOnly()"
+  [class.py-2.5]="size() === 'md' && !iconOnly()"
+  [class.p-2.5]="size() === 'md' && iconOnly()"
+  [class.text-base]="size() === 'lg'"
+  [class.px-6]="size() === 'lg' && !iconOnly()"
+  [class.py-3]="size() === 'lg' && !iconOnly()"
+  [class.p-3]="size() === 'lg' && iconOnly()"
+  
+  [class.bg-pantone-navy]="variant() === 'primary'"
+  [class.hover:bg-pantone-navy/90]="variant() === 'primary'"
+  [class.text-white]="variant() === 'primary' || variant() === 'danger' || variant() === 'success' || variant() === 'secondary' || variant() === 'accent'"
+  [class.shadow-sm]="variant() === 'primary' || variant() === 'danger' || variant() === 'accent'"
+  [class.focus:ring-pantone-navy]="variant() === 'primary'"
+  
+  [class.bg-pantone-steel]="variant() === 'secondary'"
+  [class.hover:bg-pantone-steel/90]="variant() === 'secondary'"
+  [class.focus:ring-pantone-steel]="variant() === 'secondary'"
+
+  [class.bg-pantone-orange]="variant() === 'accent'"
+  [class.hover:bg-pantone-orange/90]="variant() === 'accent'"
+  [class.focus:ring-pantone-orange]="variant() === 'accent'"
+
+  [class.border]="variant() === 'outline'"
+  [class.border-pantone-navy]="variant() === 'outline'"
+  [class.bg-white]="variant() === 'outline'"
+  [class.text-pantone-navy]="variant() === 'outline'"
+  [class.hover:bg-pantone-navy]="variant() === 'outline'"
+  [class.hover:text-white]="variant() === 'outline'"
+  [class.focus:ring-pantone-navy]="variant() === 'outline'"
+
+  [class.bg-transparent]="variant() === 'ghost' || variant() === 'link'"
+  [class.text-slate-700]="variant() === 'ghost'"
+  [class.hover:bg-slate-100]="variant() === 'ghost'"
+  [class.focus:ring-slate-400]="variant() === 'ghost'"
+
+  [class.bg-rose-600]="variant() === 'danger'"
+  [class.hover:bg-rose-700]="variant() === 'danger'"
+  [class.focus:ring-rose-500]="variant() === 'danger'"
+
+  [class.bg-emerald-600]="variant() === 'success'"
+  [class.hover:bg-emerald-700]="variant() === 'success'"
+  [class.focus:ring-emerald-500]="variant() === 'success'"
+
+  [class.bg-amber-500]="variant() === 'warning'"
+  [class.hover:bg-amber-600]="variant() === 'warning'"
+  [class.text-slate-900]="variant() === 'warning'"
+  [class.focus:ring-amber-500]="variant() === 'warning'"
+
+  [class.text-pantone-navy]="variant() === 'link'"
+  [class.hover:underline]="variant() === 'link'"
+  [class.p-0]="variant() === 'link'"
+>
+  @if (loading()) {
+    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+  } @else if (iconLeft()) {
+    <i [class]="iconLeft() + ' mr-2 text-base'"></i>
+  }
+
+  <span><ng-content></ng-content></span>
+
+  @if (iconRight() && !loading()) {
+    <i [class]="iconRight() + ' ml-2 text-base'"></i>
+  }
+</button>

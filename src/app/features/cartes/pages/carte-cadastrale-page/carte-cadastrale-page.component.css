@@ -1,0 +1,5 @@
+/* Custom styling for Leaflet pins in Carte Cadastrale */
+.custom-map-pin {
+  background: transparent;
+  border: none;
+}

@@ -1,0 +1,74 @@
+<div class="space-y-2">
+  @if (label()) {
+    <label class="block text-sm font-medium text-slate-700">
+      {{ label() }}
+    </label>
+  }
+
+  <div
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="imageInput.click()"
+    class="relative group rounded-2xl border-2 border-dashed overflow-hidden transition-all cursor-pointer flex flex-col items-center justify-center bg-slate-50/80"
+    [class.aspect-square]="aspectRatio() === 'square'"
+    [class.aspect-\[3\/4\]]="aspectRatio() === 'portrait'"
+    [class.aspect-\[16\/9\]]="aspectRatio() === 'landscape'"
+    [class.aspect-\[3\/1\]]="aspectRatio() === 'banner'"
+    [class.border-indigo-500]="isDragging()"
+    [class.bg-indigo-50/50]="isDragging()"
+    [class.border-slate-300]="!isDragging()"
+    [class.hover:border-indigo-400]="!disabled()"
+    [class.opacity-60]="disabled()"
+    [class.cursor-not-allowed]="disabled()"
+  >
+    <input
+      #imageInput
+      type="file"
+      class="hidden"
+      accept="image/*"
+      [disabled]="disabled()"
+      (change)="onFileChange($event)"
+    />
+
+    @if (displayUrl()) {
+      <img
+        [src]="displayUrl()"
+        alt="Aperçu image"
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+
+      <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-xs">
+        <button
+          type="button"
+          (click)="imageInput.click()"
+          class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-slate-900 shadow-md hover:bg-white transition-colors"
+          title="Changer l'image"
+        >
+          <i class="ti ti-camera text-xl"></i>
+        </button>
+
+        <button
+          type="button"
+          (click)="removeImage($event)"
+          class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-600/90 text-white shadow-md hover:bg-rose-600 transition-colors"
+          title="Supprimer l'image"
+        >
+          <i class="ti ti-trash text-xl"></i>
+        </button>
+      </div>
+    } @else {
+      <div class="flex flex-col items-center justify-center p-6 text-center">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 mb-3 group-hover:scale-110 transition-transform">
+          <i class="ti ti-photo-plus text-2xl"></i>
+        </div>
+        <p class="text-sm font-semibold text-slate-900 mb-0.5">
+          {{ placeholderText() }}
+        </p>
+        <p class="text-xs text-slate-400">
+          PNG, JPG ou WEBP (Max 5 Mo)
+        </p>
+      </div>
+    }
+  </div>
+</div>

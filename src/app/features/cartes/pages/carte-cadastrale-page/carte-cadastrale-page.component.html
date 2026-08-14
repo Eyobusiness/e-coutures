@@ -1,0 +1,258 @@
+<app-page-header
+  title="Carte Cadastrale"
+  subtitle="Géolocalisation et cartographie des ateliers et des couturiers / tailleurs"
+  icon="ti ti-map-2"
+  [breadcrumbs]="[
+    { label: 'Accueil', url: '/dashboard' },
+    { label: 'Carte Cadastrale', active: true }
+  ]"
+></app-page-header>
+
+<div class="space-y-6">
+  <app-card variant="default">
+    
+    <!-- Top Filter & Controls Toolbar -->
+    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 p-4 border-b border-slate-100">
+      
+      <!-- Search -->
+      <div class="w-full lg:w-72">
+        <app-search
+          placeholder="Rechercher par nom, ville, atelier..."
+          (search)="onSearch($event)"
+        ></app-search>
+      </div>
+
+      <!-- Filters & View Switcher -->
+      <div class="flex flex-wrap items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
+        
+        <!-- Category Filter Buttons -->
+        <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200/80 text-xs font-semibold text-slate-600">
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg transition-all cursor-pointer"
+            [class.bg-white]="filterType() === 'all'"
+            [class.text-slate-900]="filterType() === 'all'"
+            [class.shadow-sm]="filterType() === 'all'"
+            (click)="setFilterType('all')"
+          >
+            Tous ({{ totalPoints() }})
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+            [class.bg-white]="filterType() === 'ateliers'"
+            [class.text-slate-900]="filterType() === 'ateliers'"
+            [class.shadow-sm]="filterType() === 'ateliers'"
+            (click)="setFilterType('ateliers')"
+          >
+            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            Ateliers ({{ filteredAteliers().length }})
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+            [class.bg-white]="filterType() === 'couturiers'"
+            [class.text-slate-900]="filterType() === 'couturiers'"
+            [class.shadow-sm]="filterType() === 'couturiers'"
+            (click)="setFilterType('couturiers')"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            Couturiers ({{ filteredCouturiers().length }})
+          </button>
+        </div>
+
+        <!-- View Mode Switcher -->
+        <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200/80 text-xs font-semibold text-slate-600">
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+            [class.bg-white]="activeView() === 'carte'"
+            [class.text-slate-900]="activeView() === 'carte'"
+            [class.shadow-sm]="activeView() === 'carte'"
+            (click)="setView('carte')"
+          >
+            <i class="ti ti-map"></i> Carte
+          </button>
+
+          <button
+            type="button"
+            class="px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+            [class.bg-white]="activeView() === 'liste'"
+            [class.text-slate-900]="activeView() === 'liste'"
+            [class.shadow-sm]="activeView() === 'liste'"
+            (click)="setView('liste')"
+          >
+            <i class="ti ti-list"></i> Liste
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="p-4 relative">
+      @if (isLoading()) {
+        <div class="py-16 flex justify-center items-center">
+          <app-loader size="lg" text="Chargement de la cartographie cadastrale..."></app-loader>
+        </div>
+      }
+
+      <!-- MAP VIEW -->
+      <div [class.hidden]="isLoading() || activeView() !== 'carte'" class="space-y-3">
+        <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+          <span class="font-medium">
+            <i class="ti ti-info-circle text-indigo-500"></i> Cliquez sur un marqueur pour consulter la fiche de l'élément.
+          </span>
+          <span class="font-semibold text-slate-700">
+            Total Points Géolocalisés : {{ totalPoints() }}
+          </span>
+        </div>
+
+        <div
+          #mapContainer
+          class="w-full h-[620px] rounded-xl border border-slate-200/80 shadow-inner z-0 overflow-hidden relative"
+        ></div>
+      </div>
+
+      <!-- LIST VIEW -->
+      @if (!isLoading() && activeView() === 'liste') {
+          <div class="space-y-8 animate-fade-in">
+            
+            <!-- Ateliers Section -->
+            @if (filterType() !== 'couturiers') {
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-indigo-600"></span>
+                    Ateliers Cadastrés ({{ filteredAteliers().length }})
+                  </h3>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+                  <table class="w-full text-left text-sm border-collapse">
+                    <thead class="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                      <tr>
+                        <th class="py-3.5 px-4">Nom de l'Atelier</th>
+                        <th class="py-3.5 px-4">Localisation</th>
+                        <th class="py-3.5 px-4">Adresse</th>
+                        <th class="py-3.5 px-4">GPS (Lat, Long)</th>
+                        <th class="py-3.5 px-4">Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                      @for (item of filteredAteliers(); track item.id) {
+                        <tr class="hover:bg-slate-50/60 transition-colors">
+                          <td class="py-3.5 px-4 font-bold text-slate-900">
+                            {{ item.nom }}
+                          </td>
+                          <td class="py-3.5 px-4 text-slate-700">
+                            {{ item.ville }} <span class="text-slate-400">({{ item.pays }})</span>
+                          </td>
+                          <td class="py-3.5 px-4 text-slate-600">
+                            {{ item.adresse || 'Non précisée' }}
+                          </td>
+                          <td class="py-3.5 px-4 font-mono text-slate-600">
+                            {{ item.latitude }}, {{ item.longitude }}
+                          </td>
+                          <td class="py-3.5 px-4">
+                            @if (item.estActif) {
+                              <app-badge variant="success" size="sm" [dot]="true">Actif ({{ item.abonnementStatut }})</app-badge>
+                            } @else {
+                              <app-badge variant="neutral" size="sm" [dot]="true">Inactif</app-badge>
+                            }
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="5" class="py-6 text-center text-slate-500">
+                            Aucun atelier trouvé.
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            <!-- Couturiers Section -->
+            @if (filterType() !== 'ateliers') {
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+                    Couturiers Cadastrés ({{ filteredCouturiers().length }})
+                  </h3>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+                  <table class="w-full text-left text-sm border-collapse">
+                    <thead class="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                      <tr>
+                        <th class="py-3.5 px-4">Nom & Contact</th>
+                        <th class="py-3.5 px-4">Poste Metier</th>
+                        <th class="py-3.5 px-4">Atelier Rattaché</th>
+                        <th class="py-3.5 px-4">GPS (Lat, Long)</th>
+                        <th class="py-3.5 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                      @for (item of filteredCouturiers(); track item.employeId) {
+                        <tr class="hover:bg-slate-50/60 transition-colors">
+                          <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-900">{{ item.nomComplet }}</div>
+                            <div class="text-[11px] text-slate-500">{{ item.telephone }} | {{ item.email }}</div>
+                          </td>
+                          <td class="py-3.5 px-4 text-emerald-700 font-semibold">
+                            {{ item.posteMetier || 'Couturier' }}
+                          </td>
+                          <td class="py-3.5 px-4 text-slate-700">
+                            <div class="font-semibold">{{ item.atelierNom }}</div>
+                            <div class="text-[11px] text-slate-400">{{ item.ville }}</div>
+                          </td>
+                          <td class="py-3.5 px-4 font-mono text-slate-600">
+                            {{ item.latitude }}, {{ item.longitude }}
+                          </td>
+                          <td class="py-3.5 px-4 text-right">
+                            <app-button
+                              type="button"
+                              variant="accent"
+                              size="sm"
+                              iconLeft="ti ti-eye"
+                              (btnClick)="openCouturierDetail(item.employeId)"
+                            >
+                              Fiche
+                            </app-button>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="5" class="py-6 text-center text-slate-500">
+                            Aucun couturier trouvé.
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+          </div>
+        }
+
+    </div>
+
+  </app-card>
+</div>
+
+<!-- Couturier Detail Modal -->
+<app-couturier-detail-modal
+  [isOpen]="isDetailModalOpen()"
+  [detail]="selectedCouturierDetail()"
+  [loading]="isDetailLoading()"
+  (close)="isDetailModalOpen.set(false)"
+></app-couturier-detail-modal>

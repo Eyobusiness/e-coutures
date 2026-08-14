@@ -1,0 +1,150 @@
+.header {
+    height: 70px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid #f1f5f9; /* Slate 100 */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+/* Burger Toggle Button */
+.menu-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.menu-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.menu-btn i {
+    font-size: 20px;
+}
+
+/* Header Titles */
+.header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.title-sub {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    line-height: 1;
+    margin-bottom: 3px;
+}
+
+.title-main {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Right side action buttons */
+.action-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.action-btn i {
+    font-size: 20px;
+}
+
+/* Notification badge */
+.badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444; /* Red 500 */
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+}
+
+/* User Profile Info */
+.profile-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 8px;
+    background: none;
+    border: none;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.profile-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.profile-role {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.15s ease-out forwards;
+}
+
+@media (max-width: 768px) {
+    .profile-info {
+        display: none;
+    }
+}

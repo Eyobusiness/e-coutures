@@ -1,0 +1,97 @@
+<div class="overflow-x-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+  <table class="w-full text-left text-sm border-collapse">
+    <thead class="bg-slate-50/80 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+      <tr>
+        <th class="py-3.5 px-4">Offre / Forfait</th>
+        <th class="py-3.5 px-4">Prix Mensuel</th>
+        <th class="py-3.5 px-4">Prix Annuel</th>
+        <th class="py-3.5 px-4">Quotas Limites</th>
+        <th class="py-3.5 px-4">Statut</th>
+        <th class="py-3.5 px-4 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      @for (item of items(); track item.id) {
+        <tr class="hover:bg-slate-50/60 transition-colors">
+          <td class="py-3.5 px-4">
+            <div class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="ti ti-box text-pantone-navy"></i>
+              {{ item.nom }}
+            </div>
+          </td>
+
+          <td class="py-3.5 px-4 font-semibold text-pantone-navy">
+            {{ item.prixMensuel | number }} FCFA <span class="text-[10px] text-slate-400 font-normal">/mois</span>
+          </td>
+
+          <td class="py-3.5 px-4 font-semibold text-emerald-700">
+            {{ item.prixAnnuel | number }} FCFA <span class="text-[10px] text-slate-400 font-normal">/an</span>
+          </td>
+
+          <td class="py-3.5 px-4 text-xs space-y-1">
+            <div class="flex items-center gap-1.5 text-slate-700">
+              <i class="ti ti-building text-slate-400"></i>
+              <span>Ateliers max : <strong>{{ item.nbAteliersMax }}</strong></span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-600">
+              <i class="ti ti-users text-slate-400"></i>
+              <span>Utilisateurs : <strong>{{ item.nbUtilisateursMax }}</strong></span>
+            </div>
+          </td>
+
+          <td class="py-3.5 px-4">
+            @if (item.estActif) {
+              <app-badge variant="success" size="sm" [dot]="true">Actif</app-badge>
+            } @else {
+              <app-badge variant="neutral" size="sm" [dot]="true">Inactif</app-badge>
+            }
+          </td>
+
+          <td class="py-3.5 px-4 text-right">
+            <div class="flex items-center justify-end gap-1">
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-eye"
+                (btnClick)="view.emit(item)"
+                title="Voir détails"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-pencil"
+                (btnClick)="edit.emit(item)"
+                title="Modifier"
+              ></app-button>
+
+              <app-button
+                type="button"
+                variant="ghost"
+                size="sm"
+                [iconOnly]="true"
+                iconLeft="ti ti-trash"
+                (btnClick)="delete.emit(item)"
+                title="Supprimer"
+              ></app-button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="py-8 text-center">
+            <app-empty-state
+              title="Aucun forfait trouvé"
+              description="Cliquez sur le bouton ci-dessus pour configurer une nouvelle offre."
+              icon="ti ti-box-off"
+            ></app-empty-state>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
